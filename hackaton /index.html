@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="shortcut icon" href="sIMPLE (2).png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <style>
+        /* S'assurer que le header reste en avant-plan */
+        header {
+            z-index: 10;
+        }
+        /* S'assurer que la carte est en arrière-plan */
+        #map {
+            z-index: 1;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+    <header class="fixed top-0 w-full bg-gray-900 bg-opacity-80 backdrop-blur-md text-white shadow-md z-20" style="background-image: url('simple2.jpeg'); background-size: cover; background-position: center;">
+        <div class=" mx-auto flex items-center justify-between px-8 py-4 ml-0">
+            <img src="sIMPLE (2).png" alt="logo" class="w-24 h-30">
+            <nav class="flex ml-auto space-x-8 text-lg font-medium justify-end ">
+                <!-- Menu déroulant Explorer -->
+                <div class="relative group">
+                    <a href="#" class="text-blue-900 hover:text-blue-400 transition">Explorer</a>
+                    <div class="absolute left-1/2 transform -translate-x-1/2 mt-4 hidden group-hover:flex bg-black text-white rounded-lg shadow-lg px-12 py-6 w-[900px] border border-gray-700">
+                        <div class="flex justify-center w-full text-center">
+                            <div class="w-1/3 px-4">
+                                <p class="font-semibold text-blue-400 text-xl mb-2">Planifier mon trajet</p>
+                                <div class="border-b border-gray-600 mb-4"></div>
+                                <a href="choisir_transport.html" class="block py-2 hover:bg-gray-800 rounded transition">Choisir un transport</a>
+                                <a href="calculer_temps.html" class="block py-2 hover:bg-gray-800 rounded transition">Calculer le temps de trajet</a>
+                                <a href="optimize_itineraire.html" class="block py-2 hover:bg-gray-800 rounded transition">Optimiser l'itinéraire</a>
+                            </div>
+                            <div class="border-l border-gray-600 h-auto"></div>
+                            <div class="w-1/3 px-4">
+                                <p class="font-semibold text-blue-400 text-xl mb-2">Suivi en temps réel</p>
+                                <div class="border-b border-gray-600 mb-4"></div>
+                                <a href="suivi_bus.html" class="block py-2 hover:bg-gray-800 rounded transition">Suivi de bus</a>
+                                <a href="alerte_retard.html" class="block py-2 hover:bg-gray-800 rounded transition">Alertes de retard</a>
+                                <a href="historique_voyages.html" class="block py-2 hover:bg-gray-800 rounded transition">Historique de voyage</a>
+                            </div>
+                            <div class="border-l border-gray-600 h-auto"></div>
+                            <div class="w-1/3 px-4">
+                                <p class="font-semibold text-blue-400 text-xl mb-2">Service aux voyageurs</p>
+                                <div class="border-b border-gray-600 mb-4"></div>
+                                <a href="points_informatiques.html" class="block py-2 hover:bg-gray-800 rounded transition">Points d'information</a>
+                                <a href="assistance_urgence.html" class="block py-2 hover:bg-gray-800 rounded transition">Assistance urgence</a>
+                                <a href="demande_remboursement.html" class="block py-3 hover:bg-gray-800 rounded transition mt-4">Demander un remboursement</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <a href="propos.html" class="text-blue-900 hover:text-blue-400 transition">À propos</a>
+                <a href="conction.html" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition shadow-md">Se connecter</a>
+                <a href="inscrire.html" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition shadow-md">S'inscrire</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="mt-20">
+        <div class="flex flex-col md:flex-row">
+            <!-- Sidebar des alertes -->
+            <div class="bg-gray-800 text-white md:w-1/4 p-4 border-b md:border-r border-gray-600 mb-2">
+                <div class="flex justify-between space-x-2 mb-6">
+                    <button data-tab="ligne" class="tab-btn w-full bg-gray-700 text-white text-sm font-medium rounded-lg py-2 px-4 hover:bg-gray-600 transition-all duration-200">
+                        Lignes
+                    </button>
+                    <button data-tab="alerte" class="tab-btn w-full bg-gray-700 text-white text-sm font-medium rounded-lg py-2 px-4 hover:bg-gray-600 transition-all duration-200">
+                        Alertes
+                    </button>
+                </div>
+
+                  <!-- Recherche -->
+            <div class="mb-6">
+                <input type="text" id="searchInput" placeholder="Rechercher..." 
+                    class="w-full px-3 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 
+                        focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition-all">
+            </div>
+
+            <div id="ligneContent" class="tab-content flex flex-col gap-3">
+                <!-- Ligne 1 -->
+                <div class="bg-gray-700 rounded-lg p-3 cursor-pointer hover:bg-gray-600 transition-colors">
+                    <div class="flex items-center">
+                        <span class="text-lg mr-2">🚌</span>
+                        <div class="flex-1">
+                            <div class="text-sm font-medium">Yopougon ↔ Plateau</div>
+                            <div class="text-xs text-gray-400 mt-1">Fréquence : 8-12 min</div>
+                        </div>
+                    </div>
+                </div>
+            
+                <!-- Ligne 2 -->
+                <div class="bg-gray-700 rounded-lg p-3 cursor-pointer hover:bg-gray-600 transition-colors">
+                    <div class="flex items-center">
+                        <span class="text-lg mr-2">🌙</span>
+                        <div class="flex-1">
+                            <div class="text-sm font-medium">Abobo ↔ Marcory</div>
+                            <div class="text-xs text-gray-400 mt-1">Service nocturne jusqu'à 23h</div>
+                        </div>
+                    </div>
+                </div>
+            
+                <!-- Ligne 3 -->
+                <div class="bg-gray-700 rounded-lg p-3 cursor-pointer hover:bg-gray-600 transition-colors">
+                    <div class="flex items-center">
+                        <span class="text-lg mr-2">🌉</span>
+                        <div class="flex-1">
+                            <div class="text-sm font-medium">Cocody ↔ Treichville</div>
+                            <div class="text-xs text-gray-400 mt-1">Traversée du Pont HKB</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="alerteContent" class="tab-content flex flex-col gap-3">
+                <!-- Alerte 1 - Grève -->
+                <div class="bg-white/20 rounded-lg p-3 cursor-pointer hover:bg-white/30 transition-colors">
+                    <div class="flex items-center">
+                        <span class="text-lg mr-2">⚠️</span>
+                        <div>
+                            <div class="text-sm font-medium">Grève générale</div>
+                            <div class="text-xs text-red-300 mt-1">Lignes affectées : 3, 5, 7</div>
+                        </div>
+                    </div>
+                </div>
+            
+                <!-- Alerte 2 - Travaux -->
+                <div class="bg-white/20 rounded-lg p-3 cursor-pointer hover:bg-white/30 transition-colors">
+                    <div class="flex items-center">
+                        <span class="text-lg mr-2">🚧</span>
+                        <div>
+                            <div class="text-sm font-medium">Travaux routiers</div>
+                            <div class="text-xs text-red-300 mt-1">Déviation ligne 2 jusqu'au 15/12</div>
+                        </div>
+                    </div>
+                </div>
+            
+                <!-- Alerte 3 - Météo -->
+                <div class="bg-white/20 rounded-lg p-3 cursor-pointer hover:bg-red-800/30 transition-colors">
+                    <div class="flex items-center">
+                        <span class="text-lg mr-2">⛈️</span>
+                        <div>
+                            <div class="text-sm font-medium">Intempéries</div>
+                            <div class="text-xs hover: text-red-800 mt-1">Retards possibles sur toutes les lignes</div>
+                        </div>
+                    </div>
+                </div>
+            
+                <!-- Alerte 4 - Panne -->
+                <div class="bg-red-800/20 rounded-lg p-3 cursor-pointer hover:bg-red-800/30 transition-colors">
+                    <div class="flex items-center">
+                        <span class="text-lg mr-2">🔧</span>
+                        <div>
+                            <div class="text-sm font-medium">Panne technique</div>
+                            <div class="text-xs text-red-300 mt-1">Ligne 8 partiellement interrompue</div>
+                        </div>
+                    </div>
+                </div>
+            
+                <!-- Alerte 5 - Accident -->
+                <div class="bg-red-800/20 rounded-lg p-3 cursor-pointer hover:bg-red-800/30 transition-colors">
+                    <div class="flex items-center">
+                        <span class="text-lg mr-2">🚨</span>
+                        <div>
+                            <div class="text-sm font-medium">Accident signalé</div>
+                            <div class="text-xs text-red-300 mt-1">Bouchon sur l'axe Riviera-Marcory</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            <!-- Section principale -->
+            <div class="w-full md:w-3/4 p-4 flex flex-col">
+                <!-- Carte -->
+                <section id="itineraires" class="w-full h-[500px] md:h-[600px] mb-8">
+                    <div id="map" class="w-full h-full bg-gray-300 rounded-lg shadow-xl"></div>
+                </section>
+
+                <!-- Section combinée -->
+                <div class="flex flex-col lg:flex-row gap-8 items-start">
+                    <!-- Formulaire de planification -->
+                    <div class="w-full lg:w-2/3 bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                            <span class="bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
+                                Planification d'itinéraire
+                            </span>
+                        </h2>
+                        <form class="space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-600 mb-1">Départ</label>
+                                    <input type="text" 
+                                        class="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-400"
+                                        placeholder="Point départ">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-600 mb-1">Destination</label>
+                                    <input type="text" 
+                                        class="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-400"
+                                        placeholder="Point d'arrivée">
+                                </div>
+                            </div>
+                        
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-600 mb-1">Mode de transport</label>
+                                    <select id="transport" class="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-400">
+
+                                        
+                                        <option value="">Choisir un mode de transport</option>
+                                        <option value="bus">Bus</option>
+                                        <option value="gbaka">Gbaka</option>
+                                        <option value="taxi">Taxi</option>
+                                        <option value="vtc">VTC</option>
+                                        <option value="bateau_bus">Bateau</option>
+                                    </select>
+                                </div>
+                        
+                                <div id="vtc-submenu" class="hidden">
+                                    <label class="block text-sm font-medium text-gray-600 mb-1">Service VTC</label>
+                                    <select id="vtc-service" class="w-full px-3 py-2 rounded-lg border border-gray-200">
+                                        <option>Yango</option>
+                                        <option>InDrive</option>
+                                        <option>Uber</option>
+                                        <option>Heetch</option>
+                                    </select>
+                                </div>
+                        
+                                <div id="vtc-price-table" class="hidden">
+                                    <h3 class="text-lg font-semibold text-gray-700 mb-2">Comparaison des prix VTC</h3>
+                                    <table class="w-full border border-gray-300">
+                                        <thead>
+                                            <tr class="bg-gray-100">
+                                                <th class="border px-4 py-2">Service</th>
+                                                <th class="border px-4 py-2">Économie</th>
+                                                <th class="border px-4 py-2">Confort</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="border px-4 py-2">Yango</td>
+                                                <td class="border px-4 py-2">2000 FCFA</td>
+                                                <td class="border px-4 py-2">3500 FCFA</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="border px-4 py-2">InDrive</td>
+                                                <td class="border px-4 py-2">2200 FCFA</td>
+                                                <td class="border px-4 py-2">3700 FCFA</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="border px-4 py-2">Uber</td>
+                                                <td class="border px-4 py-2">2500 FCFA</td>
+                                                <td class="border px-4 py-2">4000 FCFA</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="border px-4 py-2">Heetch</td>
+                                                <td class="border px-4 py-2">2100 FCFA</td>
+                                                <td class="border px-4 py-2">3600 FCFA</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-600 transition-all shadow-md">
+                                Trouver l'itinéraire
+                            </button>
+                        
+
+
+                    </div>
+                                            <!-- Formulaire Intervalle de prix -->
+
+                    <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-xl">
+                        <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">
+                            <span class="bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
+                                Choisissez votre intervalle de prix
+                            </span>
+                        </h2>
+                        <form id="prix-form" class="space-y-6">
+                            <div class="flex space-x-4">
+                                <div class="w-1/2">
+                                    <label for="prix-min" class="block text-sm font-medium text-gray-600 mb-2">Prix Minimum (XOF)</label>
+                                    <input type="number" id="prix-min" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-400 focus:outline-none" placeholder="Prix minimum" required>
+                                </div>
+                                <div class="w-1/2">
+                                    <label for="prix-max" class="block text-sm font-medium text-gray-600 mb-2">Prix Maximum (XOF)</label>
+                                    <input type="number" id="prix-max" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-400 focus:outline-none" placeholder="Prix maximum" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition-all shadow-md focus:outline-none">
+                                Trouver des véhicules
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                
+
+                 
+                </div>
+            </div>
+
+        </div>
+        <!-- Section Paiement Corrigée -->
+<section class="py-12 px-4 bg-gray-50 min-h-screen">
+    <div class="max-w-4xl mx-auto">
+        <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">Moyens de paiement</h2>
+        
+        <div class="grid grid-cols-2 gap-4 md:gap-6">
+            <!-- Orange Money -->
+            <div class="payment-card bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition cursor-pointer flex flex-col items-center justify-center"
+                data-qr="https://quickchart.io/qr?text=OrangeMoney&size=200">
+                <img src="58429064a6515b1e0ad75aba (1).png" 
+                     alt="Orange Money" 
+                     class="h-16 mb-3 object-contain">
+                <p class="text-center font-medium text-gray-700">Orange Money</p>
+            </div>
+
+            <!-- MTN Mobile Money -->
+            <div class="payment-card bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition cursor-pointer flex flex-col items-center justify-center"
+                data-qr="https://quickchart.io/qr?text=MTNMoMo&size=200">
+                <img src="MTN.png" 
+                     alt="MTN Mobile Money" 
+                     class="h-16 mb-3 object-contain">
+                <p class="text-center font-medium text-gray-700">MTN Mobile Money</p>
+            </div>
+
+            <!-- Wave -->
+            <div class="payment-card bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition cursor-pointer flex flex-col items-center justify-center"
+                data-qr="https://quickchart.io/qr?text=Wave&size=200">
+                <img src="nav-logo.png" 
+                     alt="Wave" 
+                     class="h-16 mb-3 object-contain">
+            </div>
+
+            <!-- Moov Money -->
+            <div class="payment-card bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition cursor-pointer flex flex-col items-center justify-center"
+                data-qr="https://quickchart.io/qr?text=MoovMoney&size=200">
+                <img src="téléchargement.png" 
+                     alt="Moov Money" 
+                     class="h-16 mb-3 object-contain">
+                <p class="text-center font-medium text-gray-700">Moov Money</p>
+            </div>
+        </div>
+
+        <!-- Overlay QR Code -->
+        <div id="qrOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[9999] flex items-center justify-center">
+            <div class="bg-white p-6 rounded-xl max-w-xs w-full mx-4 text-center relative">
+                <button id="closeQR" class="absolute top-3 right-3 text-2xl text-gray-500 hover:text-gray-700">&times;</button>
+                <img id="qrImage" src="" alt="QR Code" class="w-48 h-48 mx-auto mb-4 border rounded-lg">
+                <p class="text-gray-600 text-sm font-medium">Scannez le QR code pour payer</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+    </main>
+    
+    <footer class="bg-gray-800 text-white py-8 text-sm">
+        <!-- Contact & Newsletter -->
+        <div class="container mx-auto px-4 md:px-8 flex flex-col md:flex-row justify-between items-center md:items-start space-y-6 md:space-y-0">
+            <!-- Contact -->
+            <div class="w-full md:w-1/3 text-center md:text-left">
+                <h4 class="text-lg font-semibold mb-2">NOUS CONTACTER</h4>
+                <p class="mb-2">Un itinéraire rapide en un clic ?</p>
+                <a href="#" class="text-blue-400 hover:text-blue-500 transition duration-300">+ par ici !</a>
+                <p class="font-medium mt-2">+225 00 00 00 00</p>
+            </div>
+    
+            <!-- Newsletter -->
+            <div class="w-full md:w-1/3 text-center md:text-left">
+                <h4 class="text-lg font-semibold mb-2">Plus d'informations</h4>
+                <form id="newsletter-form" class="flex justify-center md:justify-start items-center space-x-2">
+                    <input type="email" id="email" class="w-48 p-2 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-1 focus:ring-blue-400" placeholder="E-mail" required />
+                    <button type="submit" class="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition duration-300">→</button>
+                </form>
+            </div>
+        </div>
+    
+        <!-- Réseaux sociaux -->
+        <div class="social-icons flex justify-center space-x-4 mt-6">
+            <a href="#" class="text-white hover:text-blue-400 transition duration-300 text-lg">
+                <i class="fa-brands fa-twitter"></i>
+            </a>
+            <a href="#" class="text-white hover:text-blue-400 transition duration-300 text-lg">
+                <i class="fa-brands fa-facebook-f"></i>
+            </a>
+            <a href="#" class="text-white hover:text-blue-400 transition duration-300 text-lg">
+                <i class="fa-brands fa-linkedin-in"></i>
+            </a>
+            <a href="#" class="text-white hover:text-red-500 transition duration-300 text-lg">
+                <i class="fa-brands fa-youtube"></i>
+            </a>
+        </div>
+    
+        <!-- Bas de page -->
+        <div class="footer-bottom text-center text-gray-400 text-xs mt-6">
+            <p>© 2025 Agence Simple : Mobilité urbaine – Quartier Bonoumin, Cocody, Abidjan</p>
+            <a href="#" class="hover:text-blue-400 transition duration-300">Mentions légales</a> | 
+            <a href="#" class="hover:text-blue-400 transition duration-300">Politique de confidentialité</a>
+        </div>
+    </footer>
+    
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

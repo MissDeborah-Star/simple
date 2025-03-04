@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Ajouter Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body>
+    <nav class="mb-6 px-4" x-data="{ open: null }">
+        <div class="max-w-7xl mx-auto">
+            <h3 class="text-xl font-bold text-blue-800 mb-4">🚍 Lignes de Transport</h3>
+           
+            <div class="grid grid-cols-1 gap-3 sm:gap-4">
+                <!-- Ligne 1 avec menu déroulant -->
+                <div x-data="{ isOpen: false }" class="relative">
+                    <div
+                        @click="isOpen = !isOpen"
+                        class="group bg-white border-l-4 border-blue-300 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer"
+                    >
+                        <div class="flex items-center justify-between p-4">
+                            <!-- Contenu existant... -->
+                        </div>
+                    </div>
+
+                    <!-- Menu déroulant -->
+                    <div
+                        x-show="isOpen"
+                        x-collapse
+                        class="mt-1 ml-8 bg-blue-50 rounded-lg p-4 space-y-3"
+                    >
+                        <!-- Contenu détaillé -->
+                        <div class="flex items-center">
+                            <span class="text-sm font-medium w-24">Horaires:</span>
+                            <div class="flex-1">
+                                <p class="text-sm">6h00 - 22h00 (Lun-Sam)</p>
+                                <p class="text-sm">7h00 - 20h00 (Dim)</p>
+                            </div>
+                        </div>
+                       
+                        <div class="flex items-center">
+                            <span class="text-sm font-medium w-24">Arrêts:</span>
+                            <div class="flex-1 grid grid-cols-2 gap-2">
+                                <span class="bg-white px-2 py-1 rounded text-sm">Marché Yopougon</span>
+                                <span class="bg-white px-2 py-1 rounded text-sm">Pont Houphouët</span>
+                                <!-- Ajouter d'autres arrêts -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Répéter le pattern pour les autres lignes -->
+                <!-- Ligne 2 -->
+                <div x-data="{ isOpen: false }" class="relative">
+                    <!-- Même structure que la ligne 1 -->
+                </div>
+
+                <!-- ... -->
+            </div>
+        </div>
+    </nav>
+</body>
+</html>
+
